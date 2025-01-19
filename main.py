@@ -4,12 +4,20 @@ import time
 # Пороговые значения
 MOISTURE_THRESHOLD = 40  # Влажность почвы меньше 40% 
 TEMP_THRESHOLD = 30  # Температура больше 30°C требует включения вентилятора
+LIGHT_THRESHOLD = 200  # Свет ниже 200 люксов — надо включить свет
 
+# Модуляция портов через файлы 
 soil_moisture_file = 'soil_moisture.txt'
 pump_state_file = 'pump_state.txt'
 temperature_file = 'temperature.txt'
 fan_state_file = 'fan_state.txt'
 light_file = 'light.txt'
+display_inf = 'display.txt'
+
+# Данные на дисплей
+temperature_disp = 'Температура: ' + str(0)
+light_disp = 'Загрузка данных'
+
 
 #Чтение данных из файла
 def read_sensor_data(file_path): 
@@ -34,6 +42,11 @@ def control_pump(soil_moisture):
         write_device_state(pump_state_file, 0)  # Выключить насос
         print("Насос выключен.")
         
+def display_out(temperature, light):
+    print(temperature)
+    print(light)
+    write_device_state(display_inf, "Температура: " + temperature + " " + light)
+        
 # Контроль за вентилятором
 def control_fan(temperature):
     if temperature > TEMP_THRESHOLD:
@@ -42,6 +55,7 @@ def control_fan(temperature):
     else:
         write_device_state(fan_state_file, 0)  # Выключить вентилятор
         print("Вентилятор выключен.")
+    
 
 while True:
     
@@ -54,10 +68,15 @@ while True:
        control_pump(soil_moisture)
 
     if temperature is not None:
+       temperature_disp = 'Температура: ' + str(temperature)
        control_fan(temperature)
 
     # Логика для света
     if light is not None and light < LIGHT_THRESHOLD:
-        print("Не хватает света. Подумать о включении освещения.")
+        light_disp = "Не хватает света. Тебе стоит подумать о включении освещения."
+    else:
+        light_disp = "На улице довольно ясно."
+        
+    display_out(temperature_disp, light_disp)
         
     time.sleep(5)  # Пауза перед следующим циклом
