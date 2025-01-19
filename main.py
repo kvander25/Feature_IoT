@@ -9,6 +9,7 @@ soil_moisture_file = 'soil_moisture.txt'
 pump_state_file = 'pump_state.txt'
 temperature_file = 'temperature.txt'
 fan_state_file = 'fan_state.txt'
+light_file = 'light.txt'
 
 #Чтение данных из файла
 def read_sensor_data(file_path): 
@@ -47,11 +48,16 @@ while True:
     # Считывание данных с датчиков
     soil_moisture = read_sensor_data(soil_moisture_file)
     temperature = read_sensor_data(temperature_file)
+    light = read_sensor_data(light_file)
         
     if soil_moisture is not None:
        control_pump(soil_moisture)
 
     if temperature is not None:
-            control_fan(temperature)
+       control_fan(temperature)
+
+    # Логика для света
+    if light is not None and light < LIGHT_THRESHOLD:
+        print("Не хватает света. Подумать о включении освещения.")
         
     time.sleep(5)  # Пауза перед следующим циклом
